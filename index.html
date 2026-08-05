@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta
+      name="description"
+      content="Project page for EviSelect, an evidence-driven dynamic visual selector for efficient long video understanding."
+    >
+    <title>EviSelect: Evidence-Driven Dynamic Visual Selector</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <nav class="site-nav" aria-label="Primary navigation">
+        <a class="brand" href="#top">EviSelect</a>
+        <div class="nav-links">
+          <a href="#abstract">Abstract</a>
+          <a href="#method">Method</a>
+          <a href="#results">Results</a>
+          <a href="#qualitative">Visualization</a>
+          <a href="#citation">Citation</a>
+        </div>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero title-hero">
+        <div class="hero-inner">
+          <div class="hero-copy">
+            <p class="project-label">Long Video Understanding</p>
+            <h1>EviSelect</h1>
+            <p class="paper-full-title">
+              Evidence-Driven Dynamic Visual Selector for Efficient Long Video Understanding
+            </p>
+            <div class="authors" aria-label="Authors">
+              <div class="author-row">
+                <a href="https://github.com/ZhangBo135" target="_blank" rel="noreferrer">Bo Zhang<sup>1,*</sup></a>
+                <a href="https://github.com/WWX-2002" target="_blank" rel="noreferrer">Wenxin Wang<sup>1,*</sup></a>
+                <a href="https://chenfeng1271.github.io/" target="_blank" rel="noreferrer">Feng Chen<sup>2,&dagger;</sup></a>
+                <a
+                  href="https://github.com/zzh552"
+                  target="_blank"
+                  rel="noreferrer"
+                  title="Homepage: https://github.com/zzh552 | Email: zhangzhihao33@stu.scu.edu.cn"
+                >
+                  Zhang Zhihhao<sup>1</sup>
+                </a>
+              </div>
+              <div class="author-row">
+                <a href="https://www.researchgate.net/profile/Zixuan-Wang-109" target="_blank" rel="noreferrer">Zixuan Wang<sup>1</sup></a>
+                <a href="https://scholar.google.com/citations?user=FfJnUioAAAAJ&amp;hl=en" target="_blank" rel="noreferrer">Changsheng Li<sup>3</sup></a>
+                <a href="https://www.semanticscholar.org/author/Yinjie-Lei/46359335" target="_blank" rel="noreferrer">Yinjie Lei<sup>1,&Dagger;</sup></a>
+              </div>
+            </div>
+            <div class="institutions">
+              <span><sup>1</sup>Sichuan University</span>
+              <span><sup>2</sup>Adelaide University</span>
+              <span><sup>3</sup>Beijing Institute of Technology</span>
+            </div>
+            <div class="author-notes">
+              <span><sup>*</sup>Equal contribution</span>
+              <span><sup>&dagger;</sup>Project lead</span>
+              <span><sup>&Dagger;</sup>Corresponding author</span>
+            </div>
+            <div class="actions" aria-label="Project resources">
+              <a class="button primary" href="#" aria-disabled="true" tabindex="-1">arXiv</a>
+              <a class="button secondary" href="#" aria-disabled="true" tabindex="-1">Code Coming Soon</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="teaser-section" aria-labelledby="teaser-title">
+        <div class="content content-figure">
+          <h2 id="teaser-title">Target-MLLM Evidence for Dynamic Visual Selection</h2>
+          <figure class="paper-figure teaser-figure">
+            <div class="figure-scroll">
+              <img
+                src="assets/teaser.png"
+                alt="Comparison of existing frame selection methods with EviSelect."
+              >
+            </div>
+            <figcaption>
+              <strong>Figure 1.</strong> Instead of relying on external proxy scores,
+              EviSelect probes the target MLLM's internal attention evidence and uses it
+              to choose which timestamps to keep, how densely to sample nearby frames,
+              and which spatial resolution to allocate.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="abstract" class="section">
+        <div class="content content-reading">
+          <div class="section-kicker">Abstract</div>
+          <h2>Efficient Long Video Understanding</h2>
+          <div class="abstract-copy">
+            <p>
+              Recent advancements in MLLM-based long-form video understanding have
+              mitigated inference-time computational cost and limited context lengths
+              by selecting query-relevant frames. However, existing approaches
+              predominantly rely on external proxy scorers and rigid heuristic rules,
+              inevitably suffering from misalignment with the target MLLM's intrinsic
+              evidence and failing to accommodate the non-uniform spatiotemporal
+              information density. We propose a fine-grained dynamic visual selection
+              framework named <strong>EviSelect</strong>, grounded in
+              the target MLLM's internal attention evidence. Our method efficiently
+              probes visual evidence via sparse prefilling as a structured prior to
+              guide distribution-aware dynamic sampling.
+            </p>
+            <p>
+              Specifically, we efficiently approximate attention maps of the target
+              MLLM using highly compressed visual inputs and sparse attention, well
+              aligned to the full counterpart. Conditioned on three complementary
+              attention components derived from this prior, we design a lightweight
+              selector that not only precisely locates query-relevant timestamps but
+              also adaptively adjusts the local sampling rate and spatial resolution.
+              To enable evidence-conditioned spatiotemporal sampling, we formulate the
+              selector as a stochastic policy and optimize it via GRPO under a joint
+              accuracy-efficiency reward. Across three long video understanding
+              benchmarks, EviSelect achieves superior performance compared to existing
+              methods while reducing selected visual tokens by about 50% and achieving
+              a 3.9x end-to-end speedup.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="method" class="section section-alt">
+        <div class="content content-wide">
+          <div class="section-kicker">Method</div>
+          <h2>Evidence-Grounded Multi-Scale Sampling</h2>
+          <figure class="paper-figure detail-frame">
+            <div class="figure-scroll">
+              <img
+                src="assets/method-overview.png"
+                alt="Overview of the EviSelect evidence grounding, selector, sampling, and policy optimization pipeline."
+              >
+            </div>
+            <figcaption>
+              <strong>Figure 2.</strong> EviSelect first probes compressed anchor
+              frames to recover query-frame, inter-frame, and intra-frame evidence.
+              A small selector then predicts a joint policy over timestamp retention,
+              local sampling rate, and spatial resolution before the target MLLM
+              performs final inference.
+            </figcaption>
+          </figure>
+
+          <div class="method-grid" aria-label="Method stages">
+            <article>
+              <h3>Evidence Grounding</h3>
+              <p>
+                A sparse-prefill pass over compressed frames approximates the target
+                MLLM's attention map and preserves the evidence structure needed for
+                downstream selection.
+              </p>
+            </article>
+            <article>
+              <h3>Dynamic Allocation</h3>
+              <p>
+                The selector uses query-frame, inter-frame, and intra-frame cues to
+                decide where to retain video content, where to sample densely, and
+                where to spend spatial resolution.
+              </p>
+            </article>
+            <article>
+              <h3>Policy Optimization</h3>
+              <p>
+                GRPO trains the selector with a joint accuracy-efficiency reward, so
+                visual computation is rewarded only when it supports correct answers.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="results" class="section">
+        <div class="content content-wide">
+          <div class="section-kicker">Experiments</div>
+          <h2>Results</h2>
+
+          <div class="table-results" aria-label="Main benchmark result tables">
+            <article class="result-table-block">
+              <h3>Long Video Understanding</h3>
+              <div class="table-scroll">
+                <table class="result-table main-result-table">
+                  <thead>
+                    <tr>
+                      <th rowspan="2">Model</th>
+                      <th rowspan="2">Avg. Selected Tokens</th>
+                      <th rowspan="2">LLM Size</th>
+                      <th rowspan="2">Selector</th>
+                      <th>LongVideoBench</th>
+                      <th>MLVU</th>
+                      <th colspan="2">Video-MME</th>
+                    </tr>
+                    <tr>
+                      <th>Val</th>
+                      <th>Dev</th>
+                      <th>Long</th>
+                      <th>Avg</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="group-row">
+                      <td colspan="8">Closed-Source MLLM</td>
+                    </tr>
+                    <tr class="muted-row">
+                      <td>GPT-4o</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>Uniform</td>
+                      <td>66.7</td>
+                      <td>64.6</td>
+                      <td>65.3</td>
+                      <td>71.9</td>
+                    </tr>
+                    <tr class="muted-row">
+                      <td>GPT-4V</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>Uniform</td>
+                      <td>61.3</td>
+                      <td>49.2</td>
+                      <td>53.5</td>
+                      <td>59.9</td>
+                    </tr>
+                    <tr class="muted-row">
+                      <td>Gemini-1.5-Flash</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>Uniform</td>
+                      <td>61.6</td>
+                      <td>-</td>
+                      <td>61.1</td>
+                      <td>70.3</td>
+                    </tr>
+                    <tr class="muted-row">
+                      <td>Gemini-1.5-Pro</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>Uniform</td>
+                      <td>64.0</td>
+                      <td>-</td>
+                      <td>67.4</td>
+                      <td>75.0</td>
+                    </tr>
+                    <tr class="group-row">
+                      <td colspan="8">Open-Source MLLM</td>
+                    </tr>
+                    <tr>
+                      <td>Video-LLaVA</td>
+                      <td>2048</td>
+                      <td>7B</td>
+                      <td>Uniform</td>
+                      <td>-</td>
+                      <td>36.2</td>
+                      <td>-</td>
+                      <td>39.9</td>
+                    </tr>
+                    <tr>
+                      <td>Qwen-VL</td>
+                      <td>2048</td>
+                      <td>7B</td>
+                      <td>Uniform</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>37.8</td>
+                      <td>41.1</td>
+                    </tr>
+                    <tr>
+                      <td>Oryx-1.5</td>
+                      <td>14400</td>
+                      <td>7B</td>
+                      <td>Uniform</td>
+                      <td>56.3</td>
+                      <td>-</td>
+                      <td>51.2</td>
+                      <td>58.8</td>
+                    </tr>
+                    <tr>
+                      <td>LLaVA-Onevision</td>
+                      <td>6272</td>
+                      <td>7B</td>
+                      <td>Uniform</td>
+                      <td>56.4</td>
+                      <td>64.7</td>
+                      <td>46.7</td>
+                      <td>58.2</td>
+                    </tr>
+                    <tr>
+                      <td>NVILA</td>
+                      <td>8192</td>
+                      <td>7B</td>
+                      <td>Uniform</td>
+                      <td>57.7</td>
+                      <td>70.1</td>
+                      <td>54.8</td>
+                      <td>64.2</td>
+                    </tr>
+                    <tr>
+                      <td>Apollo</td>
+                      <td>2FPS</td>
+                      <td>7B</td>
+                      <td>Uniform</td>
+                      <td>58.5</td>
+                      <td>68.7</td>
+                      <td>-</td>
+                      <td>61.3</td>
+                    </tr>
+                    <tr>
+                      <td>LongVU</td>
+                      <td>1FPS</td>
+                      <td>7B</td>
+                      <td>DINOv2</td>
+                      <td>-</td>
+                      <td>65.4</td>
+                      <td>-</td>
+                      <td>60.6</td>
+                    </tr>
+                    <tr class="group-row">
+                      <td colspan="8">LLaVA-Video-7B Selector Comparison</td>
+                    </tr>
+                    <tr>
+                      <td>LLaVA-Video-7B*</td>
+                      <td>3360</td>
+                      <td>7B</td>
+                      <td>Uniform</td>
+                      <td>57.4</td>
+                      <td>64.4</td>
+                      <td>51.3</td>
+                      <td>60.3</td>
+                    </tr>
+                    <tr>
+                      <td>+AKS</td>
+                      <td>3360</td>
+                      <td>7B</td>
+                      <td>CLIP</td>
+                      <td>61.6</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>62.2</td>
+                    </tr>
+                    <tr>
+                      <td>+TSPO*</td>
+                      <td>3360</td>
+                      <td>7B</td>
+                      <td>TSPO-0.4B</td>
+                      <td>61.4</td>
+                      <td>68.2</td>
+                      <td>52.9</td>
+                      <td>62.1</td>
+                    </tr>
+                    <tr class="ours-row">
+                      <td>+EviSelect</td>
+                      <td>1701</td>
+                      <td>7B</td>
+                      <td>0.1B</td>
+                      <td>62.1</td>
+                      <td>69.1</td>
+                      <td>53.7</td>
+                      <td>64.0</td>
+                    </tr>
+                    <tr class="group-row">
+                      <td colspan="8">Qwen2.5-VL-7B Selector Comparison</td>
+                    </tr>
+                    <tr>
+                      <td>Qwen2.5-VL-7B*</td>
+                      <td>2912</td>
+                      <td>7B</td>
+                      <td>Uniform</td>
+                      <td>55.4</td>
+                      <td>54.3</td>
+                      <td>48.9</td>
+                      <td>57.1</td>
+                    </tr>
+                    <tr>
+                      <td>+FastV + DyToK</td>
+                      <td>1568</td>
+                      <td>7B</td>
+                      <td>-</td>
+                      <td>54.5</td>
+                      <td>43.3</td>
+                      <td>-</td>
+                      <td>58.8</td>
+                    </tr>
+                    <tr>
+                      <td>+Q-Frame</td>
+                      <td>2912</td>
+                      <td>7B</td>
+                      <td>CLIP</td>
+                      <td>57.37</td>
+                      <td>56.81</td>
+                      <td>49.02</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <td>+DIG</td>
+                      <td>2912</td>
+                      <td>7B</td>
+                      <td>DINOv2</td>
+                      <td>57.89</td>
+                      <td>63.98</td>
+                      <td>51.93</td>
+                      <td>-</td>
+                    </tr>
+                    <tr>
+                      <td>+TSPO*</td>
+                      <td>2912</td>
+                      <td>7B</td>
+                      <td>TSPO-0.4B</td>
+                      <td>58.1</td>
+                      <td>65.1</td>
+                      <td>52.1</td>
+                      <td>59.1</td>
+                    </tr>
+                    <tr class="ours-row">
+                      <td>+EviSelect</td>
+                      <td>1439</td>
+                      <td>7B</td>
+                      <td>0.1B</td>
+                      <td>59.2</td>
+                      <td>66.1</td>
+                      <td>53.0</td>
+                      <td>60.8</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="table-note">
+                On both LLaVA-Video-7B and Qwen2.5-VL-7B, EviSelect improves over
+                prior selector-based methods while using substantially fewer answer-stage
+                visual tokens. The table follows the main benchmark comparison from the
+                source LaTeX table; "*" denotes reproduced results.
+              </p>
+            </article>
+
+            <article class="result-table-block compact-table">
+              <h3>Inference Efficiency</h3>
+              <div class="table-scroll">
+                <table class="result-table">
+                  <thead>
+                    <tr>
+                      <th rowspan="2">Method</th>
+                      <th rowspan="2">Selected Tokens</th>
+                      <th colspan="3">Latency (s)</th>
+                    </tr>
+                    <tr>
+                      <th>Selection</th>
+                      <th>MLLM</th>
+                      <th>Overall</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Uniform</td>
+                      <td>3360</td>
+                      <td>0.0</td>
+                      <td>0.78</td>
+                      <td>0.78</td>
+                    </tr>
+                    <tr>
+                      <td>CoS</td>
+                      <td>13440</td>
+                      <td>28.4</td>
+                      <td>2.70</td>
+                      <td>31.10</td>
+                    </tr>
+                    <tr>
+                      <td>TSPO</td>
+                      <td>3360</td>
+                      <td>9.2</td>
+                      <td>0.78</td>
+                      <td>9.98</td>
+                    </tr>
+                    <tr class="ours-row">
+                      <td>EviSelect</td>
+                      <td>1701</td>
+                      <td>2.1</td>
+                      <td>0.45</td>
+                      <td>2.55</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="table-note">
+                The efficiency comparison measures the complete selection stage and
+                the downstream MLLM answer stage. EviSelect reduces TSPO's overall
+                latency from 9.98 s to 2.55 s while also lowering selected tokens.
+              </p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section id="qualitative" class="section section-alt">
+        <div class="content content-wide">
+          <div class="section-kicker">Visualization</div>
+          <h2>Evidence-Aware Sampling in Action</h2>
+          <figure class="paper-figure result-figure">
+            <div class="figure-scroll">
+              <img
+                src="assets/qualitative-results.png"
+                alt="Qualitative comparison between uniform sampling and EviSelect."
+              >
+            </div>
+            <figcaption>
+              <strong>Qualitative comparison.</strong> Uniform sampling spreads frames
+              evenly but can miss the decisive evidence. EviSelect concentrates frames
+              and resolution around the relevant moments, enabling the target MLLM to
+              recover fine-grained details.
+            </figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section id="citation" class="section citation-section">
+        <div class="content content-citation">
+          <div class="section-kicker">Citation</div>
+          <h2 class="citation-title">BibTeX</h2>
+          <div class="bibtex-panel">
+            <button class="copy-button" type="button" data-copy-bib>Copy</button>
+            <pre><code id="bibtex-text">@article{eviselect2026,
+  title={EviSelect: Evidence-Driven Dynamic Visual Selector for Efficient Long Video Understanding},
+  author={Zhang, Bo and Wang, Wenxin and Chen, Feng and Zhang, Zhihhao and Wang, Zixuan and Li, Changsheng and Lei, Yinjie},
+  journal={arXiv preprint},
+  year={2026}
+}</code></pre>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <p>EviSelect: Evidence-Driven Dynamic Visual Selector for Efficient Long Video Understanding</p>
+      </div>
+    </footer>
+    <script>
+      (() => {
+        const copyButton = document.querySelector('[data-copy-bib]');
+        const bibtex = document.getElementById('bibtex-text');
+        if (!copyButton || !bibtex) {
+          return;
+        }
+
+        const originalLabel = copyButton.textContent;
+        const copiedLabel = 'Copied';
+
+        const copyText = async (text) => {
+          try {
+            await navigator.clipboard.writeText(text);
+            return true;
+          } catch (error) {
+            const field = document.createElement('textarea');
+            field.value = text;
+            field.setAttribute('readonly', '');
+            field.style.position = 'fixed';
+            field.style.opacity = '0';
+            document.body.appendChild(field);
+            field.select();
+            let success = false;
+            try {
+              success = document.execCommand('copy');
+            } catch (copyError) {
+              success = false;
+            }
+            document.body.removeChild(field);
+            return success;
+          }
+        };
+
+        copyButton.addEventListener('click', async () => {
+          const success = await copyText(bibtex.textContent.trimEnd());
+          copyButton.textContent = success ? copiedLabel : 'Copy failed';
+          copyButton.disabled = true;
+          window.setTimeout(() => {
+            copyButton.textContent = originalLabel;
+            copyButton.disabled = false;
+          }, 1500);
+        });
+      })();
+    </script>
+  </body>
+</html>
