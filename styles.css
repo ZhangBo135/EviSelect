@@ -12,7 +12,7 @@
   --orange: #b45309;
   --shadow: 0 18px 45px rgba(32, 43, 58, 0.08);
   --radius: 8px;
-  --content: min(1120px, calc(100vw - 40px));
+  --content: min(960px, calc(100vw - 40px));
 }
 
 * {
@@ -254,21 +254,8 @@ sup {
   margin: 0 auto;
 }
 
-.content-reading {
-  max-width: 890px;
-}
-
-.content-wide,
-.content-figure {
-  max-width: 1180px;
-}
-
-.content-figure {
-  max-width: 960px;
-}
-
 .content-citation {
-  width: min(1480px, calc(100vw - 56px));
+  width: var(--content);
 }
 
 h2 {
@@ -302,7 +289,7 @@ p {
 
 .paper-figure {
   margin: 0;
-  max-width: 960px;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -326,7 +313,7 @@ p {
 }
 
 .paper-figure figcaption {
-  max-width: 980px;
+  max-width: 100%;
   margin: 16px auto 0;
   color: var(--muted);
   font-size: 15px;
@@ -458,7 +445,7 @@ p {
 
 .result-figure {
   margin-top: 4px;
-  max-width: 820px;
+  max-width: 100%;
 }
 
 .result-figure .figure-scroll img {
@@ -551,7 +538,7 @@ p {
 
 @media (max-width: 820px) {
   :root {
-    --content: min(100vw - 28px, 1120px);
+    --content: min(100vw - 28px, 960px);
   }
 
   .site-nav {
@@ -597,10 +584,6 @@ p {
 
   .paper-figure figcaption {
     text-align: left;
-  }
-
-  .content-citation {
-    width: min(100vw - 28px, 1480px);
   }
 
   .citation-section {
